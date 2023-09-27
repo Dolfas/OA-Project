@@ -1,4 +1,4 @@
-%% This is the solution for task 1
+cat%% This is the solution for task 1
 x = linspace(-6,6);
 plot(x,(abs(x-2)-1).^2);
 title('Cost Function: $(|x-2|-1)^2$', 'Interpreter','latex')
@@ -6,7 +6,7 @@ xlabel('x','Interpreter','latex');
 ylabel('Cost Function value', 'Interpreter','latex') ;
 xline(0, 'Color', 'k', 'LineWidth', 0.5);
 yline(0, 'Color', 'k', 'LineWidth', 0.5);
-%alex agora tou aqui
+
 %Hello my dear friends! 
 %HELLO REDOLFO
 %% Comments
@@ -18,3 +18,4 @@ yline(0, 'Color', 'k', 'LineWidth', 0.5);
 % Between the values $x = 1$ and $x = 3$ there is a spike at $x = 2$. This is due to the increasing proximity of the target to the anchor (when we are between these two local minimums) while the measured range is still the same. In mathematical terms we have, $|x-2| \rightarrow 0$ while $ r = 1$.
 % 
 % Finally, the further away the target is from these two local minimums, (i.e $x \rightarrow -\inf$ or $x \rightarrow +\inf$  ), the more the value of the cost function increases. 
+%agora o alex já sabe programar e linux e cenas
