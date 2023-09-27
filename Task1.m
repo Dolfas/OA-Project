@@ -6,7 +6,7 @@ xlabel('x','Interpreter','latex');
 ylabel('Cost Function value', 'Interpreter','latex') ;
 xline(0, 'Color', 'k', 'LineWidth', 0.5);
 yline(0, 'Color', 'k', 'LineWidth', 0.5);
-
+%nova branch
 %Hello my dear friends! 
 %HELLO REDOLFO
 %% Comments
