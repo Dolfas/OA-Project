@@ -7,7 +7,7 @@ ylabel('Cost Function value', 'Interpreter','latex') ;
 xline(0, 'Color', 'k', 'LineWidth', 0.5);
 yline(0, 'Color', 'k', 'LineWidth', 0.5);
 
-%hello brothers !
+%Hello my dear friends! 
 %% Comments
 % The cost function $(|x-2|-1)^2$, has two local minimums, one positioned at $x = 1$ and the other positioned at $x = 3$.
 % 
