@@ -70,18 +70,18 @@ disp([ num2str(k-1), ' points to interpolate from '])
 % not really needed; you may want to save the anchors positions in the txt
 % file
 
-% disp('use the mouse to input via points for the reference trajectory');
-% disp('--button 3-- to end the input');
-% button = 1;
-% k = 1;
-% while button==1,
-%     [ax(k),ay(k),button] = ginput(1);
-%     plot(ax(k),ay(k),'bo')
-%     anchor(k,:) = [ax(k), ay(k)];
-%     k = k + 1;
-% end
-% drawnow;
-% disp([ num2str(k-1), ' anchors'])
+disp('use the mouse to input via points for the reference trajectory');
+disp('--button 3-- to end the input');
+button = 1;
+k = 1;
+while button==1,
+    [ax(k),ay(k),button] = ginput(1);
+    plot(ax(k),ay(k),'bo')
+    anchor(k,:) = [ax(k), ay(k)];
+    k = k + 1;
+end
+drawnow;
+disp([ num2str(k-1), ' anchors'])
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -125,11 +125,12 @@ plot(xx,yy)
 n_meas = 1000000;        % number of measurements + 1
 step = max(floor(length(xx) / n_meas), 1);
 
-% fid = fopen('trial_3.txt', 'w');
+fid = fopen('trial_3.txt', 'w');
+writematrix(anchor,'anchors.txt','Delimiter','tab') %save matrix anchor in txt
 
 for k=1:step:length(xx)
     plot(xx(k),yy(k), 'g*');
-    % fprintf(fid, [num2str(xx(k)), ' ', num2str(yy(k)), '\n']); 
+    fprintf(fid, [num2str(xx(k)), ' ', num2str(yy(k)), '\n']); 
 end
 
 % fclose(fid)
