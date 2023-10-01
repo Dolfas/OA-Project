@@ -1,0 +1,17 @@
+%%Inicializations
+
+x = linspace(-20,20);
+y = linspace(-20,20);
+
+traj = readmatrix('trial_3.txt');
+anchors = readmatrix('anchors.txt');
+
+rate = 1/2;
+%%
+for i = length(traj)
+    if i == 1
+        v(i) = (x(i+1)-x(i))/rate;
+    end
+
+
+end
