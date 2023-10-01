@@ -1,4 +1,5 @@
 %% This is the solution for task 1
+clc
 x = linspace(-6,6);
 plot(x,(abs(x-2)-1).^2);
 title('Cost Function: $(|x-2|-1)^2$', 'Interpreter','latex')
@@ -7,8 +8,6 @@ ylabel('Cost Function value', 'Interpreter','latex') ;
 xline(0, 'Color', 'k', 'LineWidth', 0.5);
 yline(0, 'Color', 'k', 'LineWidth', 0.5);
 
-%Hello my dear friends! 
-%HELLO RODOLFO
 %% Comments
 % The cost function $(|x-2|-1)^2$, has two local minimums, one positioned at $x = 1$ and the other positioned at $x = 3$.
 % 

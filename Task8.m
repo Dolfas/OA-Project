@@ -5,19 +5,21 @@ a1 = ([-1,0]).';
 a2 = ([3,0]).';
 r1 = 2;
 r2 = 3;
-a = cos(2*pi/9);
+a = cos(2*pi/9); %40º
 b = sin(2*pi/9);
-c = cos(7*pi/9);
+c = cos(7*pi/9); %140º
 d = sin(7*pi/9);
 
-u1 = [1-a.^2,a*b;a*b,1-b^.2];
-u2 = [1-c.^2,c*d;c*d,1-d^.2];
+u1 = [1-a^2,-a*b;-a*b,1-b^2]; % I-u_k*(u_k)^T
+u2 = [1-c^2,-c*d;-c*d,1-d^2];
+
 cvx_begin quiet
     variable point(2,1);
     minimize(square_pos(norm(point-a1)-r1)+square_pos(norm(point-a2)-r2)+sum_square(u1*(point-a1))+sum_square(u2*(point-a2)));
 cvx_end;
 
-disp(point)
+fprintf('The point that minimizes the previous function is: (%f , %f) \n', point(1), point(2))
+
 %% Plotting the Optimization solution on the task3.2 contour plot
 x = linspace(-1,2);
 y = linspace(-2.5,2.5);

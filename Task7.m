@@ -1,4 +1,5 @@
 %% Solution for task 7
+clc
 x = linspace(-20,20);
 y = linspace(-20,20);
 [X,Y] = meshgrid(x,y);
@@ -48,6 +49,3 @@ scatter3(-1,0,0,'r','filled')
 scatter3(3,0,0,'r','filled')
 text(-2,3,'Anchor 1','Interpreter','latex')
 text(2.2,3,'Anchor 2','Interpreter','latex')
-
-%%
-clc

@@ -1,5 +1,6 @@
 %% Solution for task 4
 %% Problem formulation
+clc
 a1 = [-1,0];
 a2 = [3,0];
 r1 = 2;
@@ -8,7 +9,9 @@ cvx_begin quiet
     variable point(1,2);
     minimize(square_pos(norm(point-a1)-r1)+square_pos(norm(point-a2)-r2));
 cvx_end;
-disp(point)
+
+fprintf('The point that minimizes the previous function is: (%f , %f) \n', point(1), point(2))
+
 %% Plotting the Optimization solution on the task3.2 contour plot
 x = linspace(-1,2);
 y = linspace(-2.5,2.5);

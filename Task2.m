@@ -1,4 +1,5 @@
 %% Solution for the task 2
+clc
 x = linspace(-1.5,1.5);
 y = linspace(-2.5,2.5);
 [X,Y] = meshgrid(x,y);
