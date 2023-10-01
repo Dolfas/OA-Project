@@ -1,5 +1,6 @@
 %% Solution of section 3
 %% Task 1 repeated 
+clc
 x = linspace(-5,5);
 valores = [0];
 for i=1:length(x)
@@ -11,7 +12,9 @@ xlabel('x','Interpreter','latex');
 ylabel('Relaxed Cost Function value', 'Interpreter','latex') ;
 xline(0, 'Color', 'k', 'LineWidth', 0.5);
 yline(0, 'Color', 'k', 'LineWidth', 0.5);
+
 %% Task 2 repeated 
+clc
 x = linspace(-1,2);
 y = linspace(-2.5,2.5);
 [X,Y] = meshgrid(x,y);
