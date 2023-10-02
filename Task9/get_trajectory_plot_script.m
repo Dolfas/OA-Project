@@ -90,7 +90,7 @@ disp([ num2str(k-1), ' anchors'])
 % the evaluation of the polynomial for suitable instants of time is done by
 % the neval functions
 
-h = 0.01;
+h = 0.1;
 npt = length(x);        % number of via points, including initial and final
 nvia = [0:1:npt-1];
 csinterp_x = csapi(nvia,x);
