@@ -22,7 +22,7 @@ for i=1:length(y)
         values(i,j) = (max(sqrt((x(j)+1).^2+y(i).^2)-2,0).^2+max(sqrt((x(j)-3).^2+y(i).^2)-3,0).^2);
      end
 end
-contour(x,y, values, 'ShowText','on')
+contour(x,y, values, 50)%'ShowText','on')
 hold on 
 %plot design 
 xline(0, 'Color', 'k', 'LineWidth', 0.5);

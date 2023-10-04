@@ -33,7 +33,8 @@ subplot(2,1,2);
 values=[0];
 for i=1:length(y)
     for j=1:length(x)
-        values(i,j) = ((-c.^2+1)*(x(j)-3)-c*d*y(i)).^2+(-c*d*(x(j)-3)+y(i)*(-d.^2+1)) +((-a.^2+1)*(x(j)+1)-a*b*y(i)).^2+(-a*b*(x(j)+1)+y(i)*(-b.^2+1));
+        values(i,j) =((-c.^2+1)*(x(j)-3)-c*d*y(i)).^2+(-c*d*(x(j)-3)+y(i)*(-d.^2+1)).^2 +((-a.^2+1)*(x(j)+1)-a*b*y(i)).^2+(-a*b*(x(j)+1)+y(i)*(-b.^2+1)).^2;
+        %((-c.^2+1)*(x(j)-3)-c*d*y(i)).^2+(-c*d*(x(j)-3)+y(i)*(-d.^2+1)) +((-a.^2+1)*(x(j)+1)-a*b*y(i)).^2+(-a*b*(x(j)+1)+y(i)*(-b.^2+1))
      end
 end
 contour(x,y, values, 'ShowText','on')

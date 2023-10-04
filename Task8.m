@@ -22,20 +22,21 @@ fprintf('The point that minimizes the previous function is: (%f , %f) \n', point
 
 %% Plotting the Optimization solution on the task3.2 contour plot
 x = linspace(-1,2);
-y = linspace(-2.5,2.5);
+y = linspace(-1,4);
 [X,Y] = meshgrid(x,y);
 values=[0];
 for i=1:length(y)
     for j=1:length(x)
-        values(i,j) = ((-c.^2+1)*(x(j)-3)-c*d*y(i)).^2+(-c*d*(x(j)-3)+y(i)*(-d.^2+1)) +((-a.^2+1)*(x(j)+1)-a*b*y(i)).^2+(-a*b*(x(j)+1)+y(i)*(-b.^2+1))+(max(sqrt((x(j)+1).^2+y(i).^2)-2,0).^2+max(sqrt((x(j)-3).^2+y(i).^2)-3,0).^2);
+        values(i,j) = ((-c.^2+1)*(x(j)-3)-c*d*y(i)).^2+(-c*d*(x(j)-3)+y(i)*(-d.^2+1)).^2 +((-a.^2+1)*(x(j)+1)-a*b*y(i)).^2+(-a*b*(x(j)+1)+y(i)*(-b.^2+1)).^2+(max(sqrt((x(j)+1).^2+y(i).^2)-2,0).^2+max(sqrt((x(j)-3).^2+y(i).^2)-3,0).^2);
      end
 end
-contour(x,y, values, 'ShowText','on')
+contour(x,y, values, 20)
 hold on 
-%plot design 
+%plot design +
 xline(0, 'Color', 'k', 'LineWidth', 0.5);
 yline(0, 'Color', 'k', 'LineWidth', 0.5);
 title('Relaxed Cost Function with two Anchor points', 'Interpreter','latex')
 xlabel('x','Interpreter','latex');
 ylabel('y', 'Interpreter','latex') ;
 scatter3(point(1),point(2),0,'r','filled')
+
