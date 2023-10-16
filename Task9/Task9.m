@@ -9,7 +9,7 @@ y_max = 20;  % Maximum y coordinate
 % Initialization and Parameters
 T = 100;  % Number of samples
 
-% Load trajectory and anchors data
+% Load trajectory and anchors datax
 traj = readmatrix('trial_3.txt');
 anchors = readmatrix('anchors.txt');
 
@@ -17,6 +17,8 @@ anchors = readmatrix('anchors.txt');
 %[traj, anchors] = generateSpiralTrajectory(x_min, x_max, y_min, y_max, T);
 
 [simulated_velocity, range, angle] = simulateData(traj, anchors);
+
+save('task_data.mat', 'simulated_velocity', 'range', 'angle', 'anchors'); %save generated data in file
 
 % Display the trajectory and anchors
 plotTrajectoryAndAnchors(traj, anchors);
@@ -58,8 +60,9 @@ function range = calculateRange(traj, anchors)
     
     for i = 1:length(traj)
         for j = 1:length(anchors)
-            X = [traj(i,:); anchors(j,:)];
-            range(i,j) = pdist(X);
+            % X = [traj(i,:); anchors(j,:)];
+            % range(i,j) = pdist(X);
+            range(i,j) = norm(traj(i,:)-anchors(j,:));
         end
     end
 end
@@ -81,7 +84,7 @@ function [trajectory, anchorPositions] = generateSpiralTrajectory(x_min, x_max, 
     
     % Generate spiral trajectory within the bounding box
     traj_x = x_min + (x_max - x_min) * (0.5 + r .* cos(theta) / max(r));
-    traj_y = y_min + (y_max - y_min) * (0.5 + r .* sin(theta) / max(r));
+    traj_y = y_min+ (y_max - y_min) * (0.5 + r .* sin(theta) / max(r));
     
     % Create the trajectory matrix
     trajectory = [traj_x', traj_y'];
@@ -98,10 +101,10 @@ function plotTrajectoryAndAnchors(traj, anchors)
     plot(traj(:,1), traj(:,2), 'b-', 'LineWidth', 2);
     hold on;
     plot(anchors(:,1), anchors(:,2), 'ro', 'MarkerSize', 10, 'LineWidth', 2);
-    title('Simulated 2D Trajectory and Anchors');
-    xlabel('X Coordinate (m)');
-    ylabel('Y Coordinate (m)');
-    legend('Simulated Trajectory', 'Anchors');
+    title('Simulated 2D Trajectory and Anchors', 'Interpreter', 'latex');
+    xlabel('X Coordinate (m)', 'Interpreter', 'latex');
+    ylabel('Y Coordinate (m)','Interpreter', 'latex');
+    legend('Simulated Trajectory', 'Anchors','Interpreter', 'latex');
     axis equal;
     grid on;
 end

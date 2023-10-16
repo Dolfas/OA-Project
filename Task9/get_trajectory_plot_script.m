@@ -133,4 +133,4 @@ for k=1:step:length(xx)
     fprintf(fid, [num2str(xx(k)), ' ', num2str(yy(k)), '\n']); 
 end
 
-% fclose(fid)
+fclose(fid);
