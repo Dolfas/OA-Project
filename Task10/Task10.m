@@ -5,25 +5,27 @@ anchors = a;
 range = r;
 delta = tref(2) - tref(1);
 T = length(v(:,1));  
-v_hat = cvx(zeros(T,2));
 n_anchors = length(anchors(:,1));
 %% Miu = 1
 miu = 1;
-x_1 = cvx_motion_trajectory(T, n_anchors, anchors, range, delta, miu, v); %Solve optimization problem
+[x_1, ~, ~] = cvx_motion_trajectory(T, n_anchors, anchors, range, delta, miu, v); %Solve optimization problem
 plot_trajectory(x_1,xgt, miu); %Verify is the same trajectory
 %% Multiple mius + velocity inconsistency
 mius = [0.01, 0.1, 1, 10, 100, 1000]';
-v_incon = 0.8*v;
+v_incon = 1*v;
 x_values = zeros(T, 2*length(mius)); %collumns are x y coordinates in 2-to-2 pairs for each miu
+static_cost_v = zeros(length(mius),1);
+dynamic_cost_v = zeros(length(mius),1);
 cont = 1;
 for i = 1:length(mius)
     miu = mius(i);
-    x_values(:,cont:cont+1) = cvx_motion_trajectory(T, n_anchors, anchors, range, delta, miu, v_incon);
+    [x_values(:,cont:cont+1), static_cost_v(i), dynamic_cost_v(i)] = cvx_motion_trajectory(T, n_anchors, anchors, range, delta, miu, v_incon);
     cont = cont +2;
 end
 plot_trajectory(x_values,xgt, mius);
+save('cost_values.mat', 'static_cost_v', 'dynamic_cost_v');
 %% Solve optimization problem
-function x = cvx_motion_trajectory(T, n_anchors, anchors, range, delta, miu, v)
+function [x, static_cost, dynamic_cost] = cvx_motion_trajectory(T, n_anchors, anchors, range, delta, miu, v)
     cvx_begin quiet
         variable x(T, 2);
         expression v_hat(T,2);
