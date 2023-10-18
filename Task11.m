@@ -1,4 +1,3 @@
-%% Inicializations
 load('Task10/cost_values.mat');
 
 % Create a scatter plot
@@ -13,8 +12,5 @@ title('Static Cost vs Dynamic Cost');
 xlabel('Static Cost');
 ylabel('Dynamic Cost');
 grid on;
-legend('Data Points', 'Lines');
 
 hold off;  % Release the hold on the current plot
-
-% Display the plot

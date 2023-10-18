@@ -1,35 +1,36 @@
 %% Inicializations
-%load('Task9/task_data.mat');
 load('racetrack.mat', 'a', 'r', 'v', 'tref', 'xgt');
-anchors = a;
-range = r;
-delta = tref(2) - tref(1);
-T = length(v(:,1));  
-n_anchors = length(anchors(:,1));
-%% Miu = 1
-miu = 1;
-[x_1, ~, ~] = cvx_motion_trajectory(T, n_anchors, anchors, range, delta, miu, v); %Solve optimization problem
-plot_trajectory(x_1,xgt, miu); %Verify if is the same trajectory
-%% Multiple mius + velocity inconsistency
-mius = [0.01, 0.1, 1, 10, 100, 1000]';
-v_incon = 0.8*v; %Create inconsistency
-x_values = zeros(T, 2*length(mius)); %collumns are x y coordinates in 2-to-2 pairs for each miu
-static_cost_v = zeros(length(mius),1);
-dynamic_cost_v = zeros(length(mius),1);
-cont = 1; %counter to add values to matrix x_values
-for i = 1:length(mius)
+T = length(v);
+n_anchors = length(a);
+delta = tref(2)-tref(1);
+
+rng(0);
+
+scalar = 5;
+r_dev = scalar*0.1;
+v_dev = (scalar*0.1)/sqrt(2);
+
+r_noise = r_dev * randn(size(r));
+v_noise = v_dev *randn(size(v));
+
+r_noisy = r + r_noise;
+v_noisy = v + v_noise;
+
+mius = [0, 10]';
+x = zeros(T,length(mius)*2);
+cont = 1;
+for i= 1:length(mius)
     miu = mius(i);
-    [x_values(:,cont:cont+1), static_cost_v(i), dynamic_cost_v(i)] = cvx_motion_trajectory(T, n_anchors, anchors, range, delta, miu, v_incon);
-    cont = cont +2;
+    [x(:,cont:cont+1)] = cvx_motion_trajectory(T, n_anchors, a, r_noisy, delta, miu, v_noisy);
+    cont = cont + 2;
 end
-plot_trajectory(x_values,xgt, mius);
-save('cost_values.mat', 'static_cost_v', 'dynamic_cost_v'); %Save values for task 11
-%% Solve optimization problem
-function [x, static_cost, dynamic_cost] = cvx_motion_trajectory(T, n_anchors, anchors, range, delta, miu, v)
+plot_trajectory(x,xgt, mius);
+%%
+function [x] = cvx_motion_trajectory(T, n_anchors, anchors, range, delta, miu, v)
     cvx_begin quiet
         variable x(T, 2);
         expression v_hat(T,2);
-        % Build cost function
+        %Build cost function
         static_cost = 0;
         for i = 1:T 
             for j = 1:n_anchors 
@@ -44,12 +45,11 @@ function [x, static_cost, dynamic_cost] = cvx_motion_trajectory(T, n_anchors, an
             end
         end
         dynamic_cost = power(2,norm(v_hat - v));
-
         % Define the objective function as the sum of static and dynamic costs
         minimize(static_cost+miu*dynamic_cost)
     cvx_end
 end
-%% Plot trajectory
+%%
 function plot_trajectory(x_values, xgt, mius)
     if length(mius) == 1
         % Create a scatter plot for x with circular markers and connecting lines
@@ -68,19 +68,19 @@ function plot_trajectory(x_values, xgt, mius)
         hold off;
     else
         fig = figure;
-        set(fig, 'Position', [100,100,1400,900]');
+        set(fig, 'Position', [100,100,900,350]');
         cont_g = 1;
         for i = 1:length(mius)
             
             % Create a subplot with 2 rows and 3 columns
-            subplot(2, 3, i);
+            subplot(1, 2, i);
             
             % Plot the group of points
             p1 = plot(x_values(:,cont_g), x_values(:, cont_g+1), 'bo-',  'LineWidth', 1.5); 
             hold on;
             p2 = scatter(xgt(:,1), xgt(:,2), 50, 'rx');
         
-            ylim([-0.5,6]);
+            ylim([-0.5,6.5]);
             
             % Add labels, title, etc., if needed
             title(['Trajectory for Miu = ' num2str(mius(i))]);
@@ -91,3 +91,4 @@ function plot_trajectory(x_values, xgt, mius)
         end
     end
 end
+
