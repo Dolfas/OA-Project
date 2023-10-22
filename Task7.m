@@ -3,7 +3,7 @@ clc
 x = linspace(-12,12);
 y = linspace(-12,14);
 [X,Y] = meshgrid(x,y);
-a = cos(2*pi/9);
+a = cos(2*pi/9); 
 b = sin(2*pi/9);
 c = cos(7*pi/9);
 d = sin(7*pi/9);
