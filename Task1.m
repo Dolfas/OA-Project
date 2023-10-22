@@ -1,10 +1,10 @@
 %% This is the solution for task 1
 clc
-x = linspace(-6,6);
-plot(x,(abs(x-2)-1).^2);
-title('Cost Function: $(|x-2|-1)^2$', 'Interpreter','latex')
-xlabel('x','Interpreter','latex');
-ylabel('Cost Function value', 'Interpreter','latex') ;
+x = linspace(-6,10);
+plot(x,(abs(x-2)-1).^2, 'LineWidth', 2);
+title('\textbf{Cost Function:} $(|x-2|-1)^2$', 'Interpreter','latex')
+xlabel('\textbf{x}','Interpreter','latex');
+ylabel('\textbf{Cost Function value}', 'Interpreter','latex');
 xline(0, 'Color', 'k', 'LineWidth', 0.5);
 yline(0, 'Color', 'k', 'LineWidth', 0.5);
 

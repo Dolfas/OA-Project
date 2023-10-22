@@ -21,8 +21,8 @@ cvx_end;
 fprintf('The point that minimizes the previous function is: (%f , %f) \n', point(1), point(2))
 
 %% Plotting the Optimization solution on the task3.2 contour plot
-x = linspace(-1,2);
-y = linspace(-1,4);
+x = linspace(-2,4);
+y = linspace(-2,4);
 [X,Y] = meshgrid(x,y);
 values=[0];
 for i=1:length(y)
@@ -30,13 +30,13 @@ for i=1:length(y)
         values(i,j) = ((-c.^2+1)*(x(j)-3)-c*d*y(i)).^2+(-c*d*(x(j)-3)+y(i)*(-d.^2+1)).^2 +((-a.^2+1)*(x(j)+1)-a*b*y(i)).^2+(-a*b*(x(j)+1)+y(i)*(-b.^2+1)).^2+(max(sqrt((x(j)+1).^2+y(i).^2)-2,0).^2+max(sqrt((x(j)-3).^2+y(i).^2)-3,0).^2);
      end
 end
-contour(x,y, values, 20)
+contour(x,y, values, 45)
 hold on 
 %plot design +
 xline(0, 'Color', 'k', 'LineWidth', 0.5);
 yline(0, 'Color', 'k', 'LineWidth', 0.5);
-title('Relaxed Cost Function with two Anchor points', 'Interpreter','latex')
-xlabel('x','Interpreter','latex');
-ylabel('y', 'Interpreter','latex') ;
+title('\textbf{Relaxed Cost Function} $ \sum_{k=1}^{M} (||x-a_k||-r_k)^2_+ + \lambda ||(I-u_k u_k^T)(x-a_k)||^2$', 'Interpreter','latex')
+xlabel('\textbf{x}','Interpreter','latex');
+ylabel('\textbf{y}', 'Interpreter','latex') ;
 scatter3(point(1),point(2),0,'r','filled')
 
