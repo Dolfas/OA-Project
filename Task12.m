@@ -1,5 +1,5 @@
 %% Task 12 script
-load('racetrack.mat', 'a', 'r', 'v', 'tref', 'xgt');
+load('Task9/traj1.mat', 'a', 'r', 'v', 'tref', 'xgt');
 T = length(v);
 n_anchors = length(a);
 delta = tref(2)-tref(1);
@@ -81,8 +81,8 @@ function plot_trajectory(x_values, xgt, mius)
             p1 = plot(x_values(:,cont_g), x_values(:, cont_g+1), 'bo-',  'LineWidth', 1.5); 
             hold on;
             p2 = scatter(xgt(:,1), xgt(:,2), 50, 'rx');
-        
-            ylim([-0.5,6.5]);
+            xlim([-20,20]);
+            ylim([-20,20]);
             
             % Add labels, title, etc., if needed
             title(['Trajectory for Miu = ' num2str(mius(i))]);

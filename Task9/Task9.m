@@ -1,33 +1,47 @@
 %% Main Script
 
 % Define the bounding box
-x_min = -20; % Minimum x coordinate
-x_max = 20;  % Maximum x coordinate
-y_min = -20; % Minimum y coordinate
-y_max = 20;  % Maximum y coordinate
+x_lim = [-20, 20];
+y_lim = [-20,20];
 
-% Initialization and Parameters
-T = 100;  % Number of samples
+% Trajectory creation
+SR = 2;  % Frequency of samples
+a = [-19,-19; 19,-19; -19, 19; 19,19]; %position of anchors
+waypoints = [3 3 0;-4 13 0;-4 -16 0;12 -13 0;3 3 0]; %defining points
+vel = [0 1 0;-1 0 0;1 0 0;1 0 0;0 1 0]; %velocity values in such points
+t_arrival = cumsum([0 5 8 10 12]'); %time at such points
+orient = [90 0 0;180 0 0;0 0 0;0 0 0;90 0 0];%angle orientation at such points
+quants = quaternion(orient,"eulerd","ZYX","frame"); %transforming in quarternion
+trajectory = waypointTrajectory( ...
+    waypoints, SampleRate = SR, Velocities = vel, ...
+    TimeOfArrival = t_arrival, Orientation = quants);
 
-% Load trajectory and anchors datax
-traj = readmatrix('trial_3.txt');
-anchors = readmatrix('anchors.txt');
+[xgt, orient, v, acc, angvel] = trajectory();
+i = 1;
+spf = trajectory.SamplesPerFrame;
+
+while ~isDone(trajectory) %Creating trajectory points
+    idx = (i+1):(i+spf);
+    [xgt(idx,:), orient(idx,:), v(idx,:), angvel(idx,:)] = trajectory();
+    i = i + spf;
+end
+xgt(:,3) = []; %Drop z collumn
+v(:,3) = []; %Drop z collumn
+tref = 0:1/SR:length(xgt); %time at each point
 
 %Spiral
 %[traj, anchors] = generateSpiralTrajectory(x_min, x_max, y_min, y_max, T);
 
-[simulated_velocity, range, angle] = simulateData(traj, anchors);
+[simulated_velocity, r, angle] = simulateData(xgt, a);
 
-save('task_data.mat', 'simulated_velocity', 'range', 'angle', 'anchors'); %save generated data in file
+save('traj1.mat','xgt' ,'v','r', 'a', 'angle', 'tref'); %save generated data in file
 
-% Display the trajectory and anchors
-plotTrajectoryAndAnchors(traj, anchors);
-
+plotTrajectoryAndAnchors(xgt, a, x_lim,y_lim);
 %% Function to Simulate Velocity, Range, and Angle
 function [simulated_velocity, range, angle] = simulateData(traj, anchors)
     % Constants and parameters
     sampling_rate = 2;  % Sampling rate (Hz)DUVIDA SOBRE ISTO
-    delta = 1 / sampling_rate; % Time between measurements ANTES TAVA 0.1 (O CAPS LOCK SERVE PA NAO ME ESQUECER DE REVER)
+    delta = 1 / sampling_rate; 
     
     % Calculate simulated velocity
     simulated_velocity = calculateVelocity(traj, delta);
@@ -41,7 +55,7 @@ end
 
 %% Function to Calculate Simulated Velocity
 function simulated_velocity = calculateVelocity(traj, delta)
-    simulated_velocity = zeros(length(traj), 2); %DUVIDA SOBRE O FIXED RATE 2HZ
+    simulated_velocity = zeros(length(traj), 2);
     
     for i = 1:length(traj)
         if i == 1
@@ -96,7 +110,7 @@ function [trajectory, anchorPositions] = generateSpiralTrajectory(x_min, x_max, 
     anchorPositions = [anchors_x', anchors_y'];
 end
 %% Function to Plot the Trajectory and Anchors
-function plotTrajectoryAndAnchors(traj, anchors)
+function plotTrajectoryAndAnchors(traj, anchors,x_lim,y_lim)
     figure;
     plot(traj(:,1), traj(:,2), 'b-', 'LineWidth', 2);
     hold on;
@@ -104,6 +118,8 @@ function plotTrajectoryAndAnchors(traj, anchors)
     title('Simulated 2D Trajectory and Anchors', 'Interpreter', 'latex');
     xlabel('X Coordinate (m)', 'Interpreter', 'latex');
     ylabel('Y Coordinate (m)','Interpreter', 'latex');
+    xlim(x_lim);
+    ylim(y_lim);
     legend('Simulated Trajectory', 'Anchors','Interpreter', 'latex');
     axis equal;
     grid on;
