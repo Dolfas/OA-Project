@@ -1,9 +1,9 @@
 %% Inicializations
 traj = input("Press 1 for 'pear' shaped trajectory or 2 for spiral trajectory.\n");
 if traj == 1
-    load('Task9/pear_t9.mat', 'a', 'r', 'v', 'tref', 'xgt');
+    load('../Task9/pear_t9.mat', 'a', 'r', 'v', 'tref', 'xgt');
 elseif traj == 2
-    load('Task9/spiral_t9.mat', 'a', 'r', 'v', 'tref', 'xgt');
+    load('../Task9/spiral_t9.mat', 'a', 'r', 'v', 'tref', 'xgt');
 else
     fprintf('Invalid input.')
 end
@@ -16,7 +16,7 @@ miu = 1;
 plot_trajectory(x_1,xgt, miu); %Verify if is the same trajectory
 %% Multiple mius + velocity inconsistency
 mius = [0.01, 0.1, 1, 10, 100, 1000]';
-v_incon = 1*v; %Create inconsistency
+v_incon = 0.8*v; %Create inconsistency
 x_values = zeros(T, 2*length(mius)); %collumns are x y coordinates in 2-to-2 pairs for each miu
 static_cost_v = zeros(length(mius),1);
 dynamic_cost_v = zeros(length(mius),1);
