@@ -1,5 +1,6 @@
 %% Solution for task 7
 clc
+figure
 x = linspace(-12,12);
 y = linspace(-12,14);
 [X,Y] = meshgrid(x,y);
