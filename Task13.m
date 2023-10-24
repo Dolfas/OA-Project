@@ -4,21 +4,22 @@
 x_lim = [-20, 20];
 y_lim = [-20, 20];
 T = 50;  % Number of samples
-v = 5.0;  % Velocity of the target (m/s)
+aux_vel=5;
+vel = [aux_vel*0.5; aux_vel*0.5];
+v = norm(vel)  % Velocity of the target (m/s)
 scalar = 5;
 noise_std = 0.2*scalar;  % Standard deviation of noise
 
 [x0, anchor_position] = initPoints(x_lim, y_lim);
-[x, y, tref] = getLinearTrajectory(x0, v, x_lim, y_lim, T);
+[x, y, tref] = getLinearTrajectory(x0, vel, x_lim, y_lim, T);
 plotMeasurements(x,y, x0, anchor_position);
-disp(x)
 
 % Calculate true range and range rate
 r_star = sqrt((x - anchor_position(1)).^2 + (y - anchor_position(2)).^2);
 
 % Calculate the range rate for each time instant
 u = calculateUnitAngular(x, y, anchor_position, T);
-s_star = calculateRangeRate(v, u, T, 0.5);
+s_star = calculateRangeRate(vel, u, T);
 
 %Add noise to measurements
 r_noise = r_star + noise_std * randn(1, T);
@@ -32,7 +33,7 @@ for t = 1:T
     u_final(:, 1, t) = [x(t) - anchor_position(1), y(t) - anchor_position(2)] / norm([x(t) - anchor_position(1), y(t) - anchor_position(2)]);
 end
 
-vel = [v*0.5; v*0.5];
+
 
 % Calculate xgt (Ground-truth source positions) and vgt (Ground-truth source velocities)
 xgt = [x0(1) + vel(1) * tref; x0(2) + vel(2) * tref];
@@ -50,13 +51,14 @@ measurements = struct(...
     'xgt', xgt');
 
 % Save the measurements structure to a MATLAB file
-save('measurements.mat', 'measurements');
+save('measurements.mat', '-struct','measurements');
 
 %% Get init points
 function [x0,anchor_position] = initPoints(x_lim, y_lim)
     x0 = [x_lim(1), y_lim(1)];
-    anchor_position = [randi([x_lim(1), x_lim(2)]), randi([y_lim(1), y_lim(2)])];  % Distance between anchor and target
-    distance = calculateDistance(x0, anchor_position);
+    %anchor_position = [randi([x_lim(1), x_lim(2)]), randi([y_lim(1), y_lim(2)])];  
+    anchor_position = [-15,16];
+    distance = calculateDistance(x0, anchor_position);% Distance between anchor and target
     %disp("Initial Distance:");
     %disp(distance);
     while (distance < 30) 
@@ -80,12 +82,12 @@ function distance = calculateDistance(point1, point2)
     distance = sqrt(sum(squaredDifferences));
 end
 %% Generate Linear Trajectory
-function [x, y, t] = getLinearTrajectory(x0, v, x_lim, y_lim, T)
+function [x, y, t] = getLinearTrajectory(x0, vel, x_lim, y_lim, T)
     % Generate time instants
     t = linspace(0, 8, T);
     
-    x = x0(1) + v * t;
-    y = x0(2) + v * t;
+    x = x0(1) + vel(1) * t;
+    y = x0(2) + vel(2) * t;
 
 
 end
@@ -97,8 +99,7 @@ function u = calculateUnitAngular(x, y, anchor_position, T)
     end
 end
 %% Calculate Range Rate
-function s_star = calculateRangeRate(v, u, T, slope)
-    vel = [v * slope, v * slope];
+function s_star = calculateRangeRate(vel, u, T)
     s_star = zeros(1, T);
     for t = 1:T
         s_star(t) = dot(vel, u(t, :));

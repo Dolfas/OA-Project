@@ -1,12 +1,12 @@
 %% Task 16 script
-clc
-load('mh370.mat', 'xgt', 'vgt', 'tref', 'a', 'r', 'u', 'v', 'rr');
+clear
+load('measurements.mat', 'xgt', 'vgt', 'tref', 'a', 'r', 'u', 'v', 'rr');
 %% Problem formulation
 % Set initial values for v and x0
-initial_v = ([1,1])';
+initial_v = ([3,3])';
 x0=(xgt(1,:))';
 options = optimoptions(@lsqnonlin,'Algorithm','levenberg-marquardt',...
-    'MaxFunctionEvaluations',1500, 'OptimalityTolerance', 1e-7, 'OutputFcn', @record_values);  % Create an options structure for the optimizer
+    'MaxFunctionEvaluations',1500, 'FunctionTolerance', 1e-8, 'OutputFcn', @record_values);  % Create an options structure for the optimizer
 % Perform optimization using Levenberg-Marquardt
 func=@(v)cost_function(v, a, x0, tref, r, rr)
 [sol,fval] = lsqnonlin(func, initial_v, [], [], options)
@@ -60,13 +60,13 @@ function plot_output(costFun, gradientNorm, velocity,v)
     yyaxis left
     plot(gradientNorm)
     ylabel("\textbf{Norm of the cost function's gradient}", 'Interpreter','latex')
-    ylim([0 100])
+    %ylim([0 100])
     yyaxis right
     plot(costFun)
     ylabel("\textbf{Cost function}", 'Interpreter','latex')
     legend("\textbf{Norm of the cost function's gradient $\| \nabla f(v_k) \|$}",'\textbf{Cost function: $\sum_{t \in T} (\hat{r}(t) - r_t)^2 + \nu(\hat{s}(t) - s_t)^2$}', 'Interpreter','latex')
     xlabel('\textbf{Iterations}', 'Interpreter','latex')
-    ylim([0 100])
+    %ylim([0 100])
     subplot(2,1,2)
     plot(velocity(1,:),velocity(2,:), 'b-o')
     hold on
