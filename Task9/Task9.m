@@ -1,42 +1,85 @@
 %% Main Script
-
+clc;
+clear;
 % Define the bounding box
 x_lim = [-20, 20];
 y_lim = [-20,20];
 
 % Trajectory creation
-SR = 2;  % Frequency of samples
-a = [-19,-19; 19,-19; -19, 19; 19,19]; %position of anchors
-waypoints = [3 3 0;-4 13 0;-4 -16 0;12 -13 0;3 3 0]; %defining points
-vel = [0 1 0;-1 0 0;1 0 0;1 0 0;0 1 0]; %velocity values in such points
-t_arrival = cumsum([0 5 8 10 12]'); %time at such points
-orient = [90 0 0;180 0 0;0 0 0;0 0 0;90 0 0];%angle orientation at such points
-quants = quaternion(orient,"eulerd","ZYX","frame"); %transforming in quarternion
-trajectory = waypointTrajectory( ...
-    waypoints, SampleRate = SR, Velocities = vel, ...
-    TimeOfArrival = t_arrival, Orientation = quants);
-
-[xgt, orient, v, acc, angvel] = trajectory();
-i = 1;
-spf = trajectory.SamplesPerFrame;
-
-while ~isDone(trajectory) %Creating trajectory points
-    idx = (i+1):(i+spf);
-    [xgt(idx,:), orient(idx,:), v(idx,:), angvel(idx,:)] = trajectory();
-    i = i + spf;
-end
-xgt(:,3) = []; %Drop z collumn
-v(:,3) = []; %Drop z collumn
-tref = 0:1/SR:length(xgt); %time at each point
+traj = input("Press 1 for 'pear' shaped trajectory or 2 for spiral trajectory.\n");
+[xgt, orient,v,acc,angvel, a, tref] = create_trajectory(traj);
 
 %Spiral
 %[traj, anchors] = generateSpiralTrajectory(x_min, x_max, y_min, y_max, T);
 
 [simulated_velocity, r, angle] = simulateData(xgt, a);
+if traj == 1
+    save('pear_t9.mat','xgt' ,'v','r', 'a', 'angle', 'tref'); %save generated data in file
+elseif traj == 2
+    save('spiral_t9.mat','xgt' ,'v','r', 'a', 'angle', 'tref'); 
 
-save('traj1.mat','xgt' ,'v','r', 'a', 'angle', 'tref'); %save generated data in file
+end
 
 plotTrajectoryAndAnchors(xgt, a, x_lim,y_lim);
+%% Create trajectory
+function [xgt, orient,v,acc,angvel, a, tref] = create_trajectory(traj)
+SR = 2;
+    if traj == 1
+        a = [-19,-19; 19,-19; -19, 19; 19,19]; %position of anchors
+        waypoints = [3 3 0;-4 13 0;-4 -16 0;12 -13 0;3 3 0]; %defining points
+        vel = [0 1 0;-1 0 0;1 0 0;1 0 0;0 1 0]; %velocity values in such points
+        t_arrival = cumsum([0 5 8 10 12]'); %time at such points
+        orient = [90 0 0;180 0 0;0 0 0;0 0 0;90 0 0];%angle orientation at such points
+        quants = quaternion(orient,"eulerd","ZYX","frame"); %transforming in quarternion
+        trajectory = waypointTrajectory( ...
+            waypoints, SampleRate = SR, Velocities = vel, ...
+            TimeOfArrival = t_arrival, Orientation = quants);
+        
+        [xgt, orient, v, acc, angvel] = trajectory();
+        i = 1;
+        spf = trajectory.SamplesPerFrame;
+        
+        while ~isDone(trajectory) %Creating trajectory points
+            idx = (i+1):(i+spf);
+            [xgt(idx,:), orient(idx,:), v(idx,:), angvel(idx,:)] = trajectory();
+            i = i + spf;
+        end
+        xgt(:,3) = []; %Drop z collumn
+        v(:,3) = []; %Drop z collumn
+        tref = 0:1/SR:length(xgt); %time at each point
+
+    elseif traj == 2
+        a = [-19,-19; 19,-19; -19, 19; 19,19]; %position of anchors
+        waypoints = [15 0 0;0 15 0;-15 0 0;0 -15 0;10 0 0;0 10 0; -10 0 0;
+            0 -10 0;5 0 0;0 5 0;-5 0 0;0 -5 0;2.5 0 0;0 2.5 0;-2.5 0 0]; %defining points
+        vel = [0 1 0;-1 0 0;0 -1 0;1 0 0;0 1 0;-1 0 0;0 -1 0;
+            1 0 0;0 1 0;-1 0 0;0 -1 0;1 0 0;0 1 0;-1 0 0;0 -1 0]; %velocity values in such points
+        t_arrival = cumsum([0 5 5 5 5 5 5 5 5 5 5 5 5 5 5]'); %time at such points
+        orient = [90 0 0;180 0 0;90 0 0;180 0 0;90 0 0;180 0 0;90 0 0;
+            180 0 0;90 0 0;180 0 0;90 0 0;180 0 0;90 0 0;180 0 0;90 0 0];%angle orientation at such points
+        quants = quaternion(orient,"eulerd","ZYX","frame"); %transforming in quarternion
+        trajectory = waypointTrajectory( ...
+            waypoints, SampleRate = SR, Velocities = vel, ...
+            TimeOfArrival = t_arrival, Orientation = quants);
+        
+        [xgt, orient, v, acc, angvel] = trajectory();
+        i = 1;
+        spf = trajectory.SamplesPerFrame;
+        
+        while ~isDone(trajectory) %Creating trajectory points
+            idx = (i+1):(i+spf);
+            [xgt(idx,:), orient(idx,:), v(idx,:), angvel(idx,:)] = trajectory();
+            i = i + spf;
+        end
+        xgt(:,3) = []; %Drop z collumn
+        v(:,3) = []; %Drop z collumn
+        tref = 0:1/SR:length(xgt); %time at each point
+    else
+        fprintf('Invalid input.\n')
+
+
+    end    
+end
 %% Function to Simulate Velocity, Range, and Angle
 function [simulated_velocity, range, angle] = simulateData(traj, anchors)
     % Constants and parameters

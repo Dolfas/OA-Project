@@ -1,12 +1,20 @@
 %% Task 12 script
-load('Task9/traj1.mat', 'a', 'r', 'v', 'tref', 'xgt');
+traj = input("Press 1 for 'pear' shaped trajectory or 2 for spiral trajectory.\n");
+if traj == 1
+    load('Task9/pear_t9.mat', 'a', 'r', 'v', 'tref', 'xgt');
+elseif traj == 2
+    load('Task9/spiral_t9.mat', 'a', 'r', 'v', 'tref', 'xgt');
+else
+    fprintf('Invalid input.')
+end
+
 T = length(v);
 n_anchors = length(a);
 delta = tref(2)-tref(1);
 
 rng(0); %set seed to be the same whenever we run the script for consistency
   
-scalar = 3;
+scalar = 5;
 r_dev = scalar*0.1; %standard deviation for ranges
 v_dev = (scalar*0.1)/sqrt(2); %standard deviation for velocity
 
