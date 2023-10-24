@@ -9,10 +9,12 @@ options = optimoptions(@lsqnonlin,'Algorithm','levenberg-marquardt',...
     'MaxFunctionEvaluations',1500, 'OptimalityTolerance', 1e-7, 'OutputFcn', @record_values);  % Create an options structure for the optimizer
 % Perform optimization using Levenberg-Marquardt
 func=@(v)cost_function(v, a, x0, tref, r, rr)
-[sol,fval,eflag,output] = lsqnonlin(func, initial_v, [], [], options)
+[sol,fval] = lsqnonlin(func, initial_v, [], [], options)
 %cost_function_hist, gradientNorm_hist and velocity_hist save their
 %respetctive optimization parameter for each iteration
-
+scatter3(v(1,1),v(1,2),0,'r','filled')
+legend('\textbf{Velocity vector along iterations $v_k$}','\textbf{True $v$}' ,'Interpreter','latex')
+hold off
 %% Functions to support optimization
 function F = cost_function(v, a, x0 ,tref, r, rr)
     delta=tref(2) - tref(1);
@@ -50,26 +52,25 @@ function stop = record_values(v,optimValues,state)
         otherwise
     end
 end
-function plot_output(costFun, gradientNorm, velocity)
+function plot_output(costFun, gradientNorm, velocity,v)
     figure      
 
     subplot(2,1,1)
-    title('Optimaztion parameters - Levenberg-Marquard method')
+    title('\textbf{Optimaztion parameters - Levenberg-Marquard method}', 'Interpreter','latex')
     yyaxis left
     plot(gradientNorm)
+    ylabel("\textbf{Norm of the cost function's gradient}", 'Interpreter','latex')
     ylim([0 100])
     yyaxis right
     plot(costFun)
-    legend("Norm of the cost function's gradient",'Cost function')
-    xlabel('Iterations')
+    ylabel("\textbf{Cost function}", 'Interpreter','latex')
+    legend("\textbf{Norm of the cost function's gradient $\| \nabla f(v_k) \|$}",'\textbf{Cost function: $\sum_{t \in T} (\hat{r}(t) - r_t)^2 + \nu(\hat{s}(t) - s_t)^2$}', 'Interpreter','latex')
+    xlabel('\textbf{Iterations}', 'Interpreter','latex')
     ylim([0 100])
     subplot(2,1,2)
-
-    plot(velocity(1,:),velocity(2,:), '-o')
-    legend('Velocity vector iteration evolution')
-    title('Velocity')
-    xlabel('x Velocity (m/s)')
-    ylabel('y Velocity (m/s)')
-
-
-end
+    plot(velocity(1,:),velocity(2,:), 'b-o')
+    hold on
+    title('\textbf{Velocity}', 'Interpreter','latex')
+    xlabel('\textbf{x Velocity (m/s)}', 'Interpreter','latex')
+    ylabel('\textbf{y Velocity (m/s)}', 'Interpreter','latex')
+   end
