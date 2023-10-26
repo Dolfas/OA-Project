@@ -119,7 +119,8 @@ function plotMeasurements(x, y, x_2, y_2, x0, anchor_position)
     xlabel('X Coordinate (m)');
     ylabel('Y Coordinate (m)');
     title('Simulated 2D Linear Trajectory and Measurements');
-    legend('Simulated Trajectory with true velocity', 'Simulated trajectory for velocity of different local minima', 'Initial Position', 'Anchor Position');
+    'Simulated trajectory with velocity corresponding to different local minima'
+    legend('Simulated Trajectory', 'Simulated Trajectory', 'Initial Position', 'Anchor Position');
     grid on;
 end
 %% Display the range and range rate measurements
