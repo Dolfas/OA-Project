@@ -6,30 +6,54 @@ load('measurements.mat', 'xgt', 'vgt', 'tref', 'a', 'r', 'u', 'v', 'rr');
 initial_v = ([3,3])';
 x0=(xgt(1,:))';
 options = optimoptions(@lsqnonlin,'Algorithm','levenberg-marquardt',...
-    'MaxFunctionEvaluations',1500, 'FunctionTolerance', 1e-8, 'OutputFcn', @record_values);  % Create an options structure for the optimizer
-% Perform optimization using Levenberg-Marquardt
-func=@(v)cost_function(v, a, x0, tref, r, rr)
-[sol,fval] = lsqnonlin(func, initial_v, [], [], options)
-%cost_function_hist, gradientNorm_hist and velocity_hist save their
-%respetctive optimization parameter for each iteration
-scatter3(v(1,1),v(1,2),0,'r','filled')
-legend('\textbf{Velocity vector along iterations $v_k$}','\textbf{True $v$}' ,'Interpreter','latex')
-hold off
+    'MaxFunctionEvaluations',1500, 'FunctionTolerance', 1e-6, 'OutputFcn', @record_values, 'SpecifyObjectiveGradient',true);  % Create an options structure for the optimizer
+    % Perform optimization using Levenberg-Marquardt
+
+%for i = 1:length(nius)
+    niu=1;
+   
+    func=@(v)cost_function(v, a, x0, tref, r, rr)
+    [sol,fval] = lsqnonlin(func, initial_v, [], [], options)
+    %cost_function_hist, gradientNorm_hist and velocity_hist save their respetctive optimization parameter for each iteration
+    scatter3(v(1,1),v(1,2),0,'r','filled')
+    legend('\textbf{Velocity vector along iterations $v_k$}','\textbf{True $v$}' ,'Interpreter','latex')
+    a=sprintf('Velocity - Niu value:%f', niu);
+    title(a);%, 'Interpreter','latex')
+    hold off
+
+%end
+
 %% Functions to support optimization
-function F = cost_function(v, a, x0 ,tref, r, rr)
-    delta=tref(2) - tref(1);
-    F=0;
-    derivative_term=0;
-    for i = 1:length(tref) 
-        if i == 1
-            derivative_term = ( norm(x0+v*tref(i+1)-a') - norm(x0+v*tref(i)-a') )/(delta);
-        elseif i == length(tref) 
-            derivative_term = ( norm(x0+v*tref(i)-a') - norm(x0+v*tref(i-1)-a') )/(delta);
-        else
-            derivative_term = ( norm(x0+v*tref(i+1)-a') - norm(x0+v*tref(i-1)-a') )/(2*delta);
-        end
-    F = F + (norm(x0+v*tref(i)-a') - r(i)).^2 + norm(v)*((derivative_term - rr(i)).^2);
+function [F,J] = cost_function(v, a, x0 ,tref, r, rr)
+    niu=1;
+    F= residual_func(v, a, x0, tref, r, rr, niu);
+    J= residual_Jacbobian(v, a, x0, tref, niu);
+end
+
+function residual = residual_func(v, a, x0, tref, r, rr, niu)
+for i = 1:length(tref)
+    aux=x0+v*tref(i)-a';
+    rR(i)=norm(aux) - r(i);
+    rRR(i)= sqrt(niu)*( (v'*(aux)/(norm(aux))) - rr(i));
+end
+residual=[rR,rRR]';
+end
+
+function J= residual_Jacbobian(v, a, x0, tref, niu)
+
+    for i = 1:length(tref)
+        %for range
+        aux=x0+v*tref(i)-a';
+        jR(i,:) = ((aux/norm(aux)) *tref(i))';
+        
+        %for range rate
+        P = v'*aux;
+        Q = norm(aux);
+        P_grad= v*tref(i) + aux;
+        Q_grad=aux/norm(aux);
+        jRR(i,:)= (( (P_grad * Q - P*Q_grad)/(Q^2) ) *sqrt(niu))';
     end
+J=[jR;jRR];
 end
 function stop = record_values(v,optimValues,state)
     persistent gradientNorm_history costFun_history velocity_history
@@ -52,9 +76,8 @@ function stop = record_values(v,optimValues,state)
         otherwise
     end
 end
-function plot_output(costFun, gradientNorm, velocity,v)
+function plot_output(costFun, gradientNorm, velocity)
     figure      
-
     subplot(2,1,1)
     title('\textbf{Optimaztion parameters - Levenberg-Marquard method}', 'Interpreter','latex')
     yyaxis left
@@ -70,7 +93,6 @@ function plot_output(costFun, gradientNorm, velocity,v)
     subplot(2,1,2)
     plot(velocity(1,:),velocity(2,:), 'b-o')
     hold on
-    title('\textbf{Velocity}', 'Interpreter','latex')
     xlabel('\textbf{x Velocity (m/s)}', 'Interpreter','latex')
     ylabel('\textbf{y Velocity (m/s)}', 'Interpreter','latex')
    end
