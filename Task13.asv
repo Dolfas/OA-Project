@@ -6,20 +6,22 @@ y_lim = [-20, 20];
 T = 50;  % Number of samples
 aux_vel=5;
 vel = [aux_vel*0.5; aux_vel*0.5];
+vel_2 = [-1.7254; 3.0880];
 v = norm(vel)  % Velocity of the target (m/s)
 scalar = 5;
 noise_std = 0.2*scalar;  % Standard deviation of noise
 
 [x0, anchor_position] = initPoints(x_lim, y_lim);
 [x, y, tref] = getLinearTrajectory(x0, vel, x_lim, y_lim, T);
-plotMeasurements(x,y, x0, anchor_position);
+[x_2, y_2, tref_2] = getLinearTrajectory(x0, vel_2, x_lim, y_lim, T);
+plotMeasurements(x,y, x_2, y_2, x0, anchor_position);
 
 % Calculate true range and range rate
 r_star = sqrt((x - anchor_position(1)).^2 + (y - anchor_position(2)).^2);
 
 % Calculate the range rate for each time instant
 u = calculateUnitAngular(x, y, anchor_position, T);
-s_star = calculateRangeRate(v, u, T, 0.5);
+s_star = calculateRangeRate(vel, u, T);
 
 %Add noise to measurements
 r_noise = r_star + noise_std * randn(1, T);
@@ -99,24 +101,26 @@ function u = calculateUnitAngular(x, y, anchor_position, T)
     end
 end
 %% Calculate Range Rate
-function s_star = calculateRangeRate(v, u, T, slope)
-    vel = [v * slope, v * slope];
+function s_star = calculateRangeRate(vel, u, T)
     s_star = zeros(1, T);
     for t = 1:T
         s_star(t) = dot(vel, u(t, :));
     end
 end
 %% Plot trajectory and measurements
-function plotMeasurements(x, y, x0, anchor_position)
+function plotMeasurements(x, y, x_2, y_2, x0, anchor_position)
     figure;
     plot(x, y, 'b-', 'LineWidth', 2);
+    hold on;
+    plot(x_2, y_2, 'c-', 'LineWidth', 2);
     hold on;
     plot(x0(1), x0(2), 'go', 'MarkerSize', 10, 'LineWidth', 2);  % Initial position
     plot(anchor_position(1), anchor_position(2), 'ro', 'MarkerSize', 10, 'LineWidth', 2);  % Anchor position
     xlabel('X Coordinate (m)');
     ylabel('Y Coordinate (m)');
     title('Simulated 2D Linear Trajectory and Measurements');
-    legend('Simulated Trajectory', 'Initial Position', 'Anchor Position');
+    'Simulated trajectory with velocity corresponding to different local minima'
+    legend('Simulated Trajectory', 'Simulated Trajectory', 'Initial Position', 'Anchor Position');
     grid on;
 end
 %% Display the range and range rate measurements
@@ -143,8 +147,5 @@ function plotRangeAndRangeRate(r_star, s_star, r_noise, s_noise)
     xlabel('Time Step');
     ylabel('Range Rate (m/s)');
     grid on;
-    
-    % Set common title
-    sgtitle('True and Noisy Range/Range Rate Measurements');
 end
 
