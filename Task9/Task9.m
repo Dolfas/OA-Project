@@ -1,25 +1,24 @@
-%% Main Script
+%% Main for task 9
 clc;
 clear;
 % Define the bounding box
 x_lim = [-20, 20];
-y_lim = [-20,20];
+y_lim = [-25,25];
 
-% Trajectory creation
+% User defines created trajectory
 traj = input("Press 1 for 'pear' shaped trajectory or 2 for spiral trajectory.\n");
 [xgt, orient,v,acc,angvel, a, tref] = create_trajectory(traj);
 
-%Spiral
-%[traj, anchors] = generateSpiralTrajectory(x_min, x_max, y_min, y_max, T);
-
+% Since waypointTrajectory() function returns velocity and orientation at
+% each point, only r will be usefull
 [simulated_velocity, r, angle] = simulateData(xgt, a);
+
 if traj == 1
     save('pear_t9.mat','xgt' ,'v','r', 'a', 'angle', 'tref'); %save generated data in file
 elseif traj == 2
     save('spiral_t9.mat','xgt' ,'v','r', 'a', 'angle', 'tref'); 
-
 end
-
+%plot trajectory and anchors
 plotTrajectoryAndAnchors(xgt, a, x_lim,y_lim);
 %% Create trajectory
 function [xgt, orient,v,acc,angvel, a, tref] = create_trajectory(traj)
@@ -46,7 +45,8 @@ SR = 2;
         end
         xgt(:,3) = []; %Drop z collumn
         v(:,3) = []; %Drop z collumn
-        tref = 0:1/SR:length(xgt); %time at each point
+        time = 0:1/SR:(length(xgt)-1)*(1/SR); %time at each point
+        tref = time';
 
     elseif traj == 2
         a = [-19,-19; 19,-19; -19, 19; 19,19]; %position of anchors
@@ -54,7 +54,7 @@ SR = 2;
             0 -10 0;5 0 0;0 5 0;-5 0 0;0 -5 0;2.5 0 0;0 2.5 0;-2.5 0 0]; %defining points
         vel = [0 1 0;-1 0 0;0 -1 0;1 0 0;0 1 0;-1 0 0;0 -1 0;
             1 0 0;0 1 0;-1 0 0;0 -1 0;1 0 0;0 1 0;-1 0 0;0 -1 0]; %velocity values in such points
-        t_arrival = cumsum([0 5 5 5 5 5 5 5 5 5 5 5 5 5 5]'); %time at such points
+        t_arrival = cumsum([0 4 4 4 4 3 3 3 3 3 3 3 3 3 3]'); %time at such points
         orient = [90 0 0;180 0 0;90 0 0;180 0 0;90 0 0;180 0 0;90 0 0;
             180 0 0;90 0 0;180 0 0;90 0 0;180 0 0;90 0 0;180 0 0;90 0 0];%angle orientation at such points
         quants = quaternion(orient,"eulerd","ZYX","frame"); %transforming in quarternion
@@ -73,11 +73,10 @@ SR = 2;
         end
         xgt(:,3) = []; %Drop z collumn
         v(:,3) = []; %Drop z collumn
-        tref = 0:1/SR:length(xgt); %time at each point
+        time = 0:1/SR:(length(xgt)-1)*(1/SR); %time at each point
+        tref = time';
     else
         fprintf('Invalid input.\n')
-
-
     end    
 end
 %% Function to Simulate Velocity, Range, and Angle
@@ -95,7 +94,6 @@ function [simulated_velocity, range, angle] = simulateData(traj, anchors)
     % Calculate angle at each point
     angle = calculateAngle(traj);
 end
-
 %% Function to Calculate Simulated Velocity
 function simulated_velocity = calculateVelocity(traj, delta)
     simulated_velocity = zeros(length(traj), 2);
@@ -110,20 +108,16 @@ function simulated_velocity = calculateVelocity(traj, delta)
         end
     end
 end
-
 %% Function to Calculate Range
 function range = calculateRange(traj, anchors)
     range = zeros(length(traj), length(anchors));
     
     for i = 1:length(traj)
         for j = 1:length(anchors)
-            % X = [traj(i,:); anchors(j,:)];
-            % range(i,j) = pdist(X);
             range(i,j) = norm(traj(i,:)-anchors(j,:));
         end
     end
 end
-
 %% Function to Calculate Angle
 function angle = calculateAngle(traj)
     angle = zeros(length(traj), 1);
@@ -133,34 +127,15 @@ function angle = calculateAngle(traj)
         angle(i) = atan2(y2 - y1, x2 - x1);
     end
 end
-
-%% Function to Generate a Spiral Trajectory and Randomly Place Anchors
-function [trajectory, anchorPositions] = generateSpiralTrajectory(x_min, x_max, y_min, y_max, num_points)
-    theta = linspace(0, 4*pi, num_points); % Angle for the spiral
-    r = linspace(0, 10, num_points); % Radius for the spiral
-    
-    % Generate spiral trajectory within the bounding box
-    traj_x = x_min + (x_max - x_min) * (0.5 + r .* cos(theta) / max(r));
-    traj_y = y_min+ (y_max - y_min) * (0.5 + r .* sin(theta) / max(r));
-    
-    % Create the trajectory matrix
-    trajectory = [traj_x', traj_y'];
-    
-    % Number of anchors and their positions
-    num_anchors = 5;  % Adjust as needed
-    anchors_x = x_min + (x_max - x_min) * rand(1, num_anchors);
-    anchors_y = y_min + (y_max - y_min) * rand(1, num_anchors);
-    anchorPositions = [anchors_x', anchors_y'];
-end
 %% Function to Plot the Trajectory and Anchors
 function plotTrajectoryAndAnchors(traj, anchors,x_lim,y_lim)
     figure;
     plot(traj(:,1), traj(:,2), 'b-', 'LineWidth', 2);
     hold on;
     plot(anchors(:,1), anchors(:,2), 'ro', 'MarkerSize', 10, 'LineWidth', 2);
-    title('Simulated 2D Trajectory and Anchors', 'Interpreter', 'latex');
-    xlabel('X Coordinate (m)', 'Interpreter', 'latex');
-    ylabel('Y Coordinate (m)','Interpreter', 'latex');
+    title('\textbf{Simulated 2D Trajectory and Anchors}', 'Interpreter', 'latex');
+    xlabel('\textbf{x Coordinate (m)}', 'Interpreter','latex');
+    ylabel('\textbf{y Coordinate (m)}', 'Interpreter','latex');
     xlim(x_lim);
     ylim(y_lim);
     legend('Simulated Trajectory', 'Anchors','Interpreter', 'latex');
